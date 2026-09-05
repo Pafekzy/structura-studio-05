@@ -926,6 +926,14 @@ export class MilestoneService {
       };
     }
 
+    if (milestone.status === 'NOT_STARTED') {
+      throw {
+        statusCode: 400,
+        error: 'Cannot start QA/QC inspection on a milestone that has not yet commenced work.',
+        code: 'INVALID_MILESTONE_STATE_TRANSITION',
+      };
+    }
+
     const { fullName } = await this.getActorDetails(userId);
     const now = new Date().toISOString();
     const inspectionId = `insp-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -1615,6 +1623,18 @@ export class MilestoneService {
         error: `Cannot approve milestone: QA/QC review has not passed (current QA/QC status: '${milestone.qaQcStatus}').`,
         code: 'QA_QC_APPROVAL_REQUIRED',
       };
+    }
+
+    if (data.decision === 'APPROVE') {
+      const ncrs = await ncrRepository.listNCRsByMilestone(milestone.id);
+      const openNcrs = ncrs.filter(n => n.status !== 'CLOSED');
+      if (openNcrs.length > 0) {
+        throw {
+          statusCode: 400,
+          error: `Cannot approve milestone: ${openNcrs.length} unresolved Non-Conformance Report(s) remain open for this milestone. All NCRs must be formally closed by the QA/QC Auditor first.`,
+          code: 'BLOCKING_NCR_PRESENT',
+        };
+      }
     }
 
     const { fullName } = await this.getActorDetails(userId);

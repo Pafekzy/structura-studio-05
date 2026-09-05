@@ -11,3 +11,4 @@ Thumbs.db
 
 # Developer Sandbox persistence
 /data/
+*.bundle
