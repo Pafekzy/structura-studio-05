@@ -21,7 +21,7 @@ import { ZodError } from 'zod';
 export const milestoneRouter = Router();
 
 // Apply requireAuth to all milestone, evidence, and submission endpoints
-milestoneRouter.use('/projects', requireAuth);
+milestoneRouter.use(requireAuth);
 
 function handleError(err: any, res: Response) {
   if (err instanceof ZodError) {

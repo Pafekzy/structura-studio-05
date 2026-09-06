@@ -19,11 +19,6 @@ const PORT = 3000;
 
 app.use(express.json({ limit: '25mb' }));
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', hasGeminiKey: Boolean(process.env.GEMINI_API_KEY) });
-});
-
 // Authentication & User Profile Routes (Sprint 02)
 app.use('/api/auth', authRouter);
 app.use('/api/users', authRouter);
@@ -57,6 +52,11 @@ function getAIClient(): GoogleGenAI | null {
   }
   return aiClient;
 }
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', hasGeminiKey: Boolean(process.env.GEMINI_API_KEY) });
+});
 
 // Helper for domain-based cost estimation calculations
 function computeEngineeredEstimate(specs: {
